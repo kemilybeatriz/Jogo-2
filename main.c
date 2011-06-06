@@ -2,10 +2,14 @@
 
 void main()
 {
-    int matriz[LINHA][COLUNA];
-    char opcao;
-    char sair;
-    int tempo, tempoTeste1, tempoTeste2;
+    int matriz[LINHA][COLUNA]; // matriz do jogo
+    int i, j; // usadas para percorrer a matriz
+    int mat_x, mat_y; // usadas para posicionar cada item da matriz
+    int x, y; // usadas para posicionar o cursor do jogador
+    char opcao; // usada para o menu
+    char a; // usada na captura das teclas durante o jogo
+    char sair; // usada para sair do laço do jogo
+    int tempo, tempoTeste1, tempoTeste2; // usadas para controlar o tempo
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -25,14 +29,25 @@ void main()
             system("cls");
 
             // inicializando variáveis
+            x = LIM_MIN_X+6;
+            y = LIM_MIN_Y+3;
             sair = 0;
             tempo = TEMPO_INICIAL;
             tempoTeste1 = time(NULL);
             tempoTeste2 = time(NULL);
 
+            //inicializando matriz do jogo
+            iniciaMatriz(matriz);
+
+            bordasJogo();
+
             // laço para o jogo; só sai quando 'sair' receber 1
             do
             {
+                if(tempo==0)
+                {
+                    sair = 1;
+                }
                 // decrementa a variável 'tempo' a cada segundo
                 if(tempoTeste1!=tempoTeste2)
                 {
@@ -41,21 +56,67 @@ void main()
                 }
                 tempoTeste1 = time(NULL);
 
-                if(tempo==0)
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
+                printf("Tempo: %ds  ", tempo);
+
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+3);
+                printf("matriz[%d][%d]: %c", descobrePosI(y), descobrePosJ(x), matriz[descobrePosI(y)][descobrePosJ(x)]);
+
+                for(i=0, mat_y=LIM_MIN_Y+3; i<LINHA; i++, mat_y=mat_y+2)
                 {
-                    sair = 1;
+                    for(j=0, mat_x=LIM_MIN_X+6; j<COLUNA; j++, mat_x=mat_x+3)
+                    {
+                        // imprime o cursor do jogador
+                        if(mat_x==x && mat_y==y)
+                        {
+                            textbackground(DARKGRAY);
+                        }
+                        else
+                        {
+                            textbackground(BLACK);
+                        }
+                        // imprime o elemento da matriz
+                        exibeElemento(matriz[i][j], mat_x, mat_y);
+                    }
                 }
 
-                printf("%ds", tempo);
-
-                system("cls");
+                fflush(stdin);
+                if (kbhit()) // se alguma tecla for pressionada
+                {
+                    fflush(stdin);
+                    a = getch(); // pega mais uma...
+                    switch (a)
+                    {
+                    case 72: // seta para cima
+                        if( y>=LIM_MIN_Y+5 && y<=LIM_MAX_Y-2 )
+                        {
+                            y = y-2;
+                        }
+                        break;
+                    case 80: // seta para baixo
+                        if( y>=LIM_MIN_Y+3 && y<=LIM_MAX_Y-4 )
+                        {
+                            y = y+2;
+                        }
+                        break;
+                    case 77: // seta direita
+                        if( x>=LIM_MIN_X+6 && x<=LIM_MAX_X-6 )
+                        {
+                            x = x+3;
+                        }
+                        break;
+                    case 75: // seta esquerda
+                        if( x>=LIM_MIN_X+9 && x<=LIM_MAX_X-3 )
+                        {
+                            x = x-3;
+                        }
+                        break;
+                    }
+                }
+                textcolor(LIGHTGRAY);
+                textbackground(BLACK);
             }
             while(sair==0);
-
-            //sorteiaFrutas(matriz);
-            //exibeCenario(matriz);
-            fflush(stdin);
-            getchar();
             break;
         case '3': // Sai do jogo
             printf("Saindo...");
