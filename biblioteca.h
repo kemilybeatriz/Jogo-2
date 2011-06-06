@@ -36,6 +36,7 @@ void fazVarredura(int m[LINHA][COLUNA]);
 int descobrePosJ(int x);
 int descobrePosI(int y);
 void exibeElemento(int elemento, int x, int y);
+void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
 
 void menu()
 {
@@ -182,5 +183,19 @@ void exibeElemento(int elemento, int x, int y)
     gotoxy(x, y);
     printf("%c", elemento);
     textcolor(LIGHTGRAY);
+}
+
+void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
+{
+    int i, j, aux;
+
+    x1 = descobrePosJ(x1);
+    y1 = descobrePosI(y1);
+    x2 = descobrePosJ(x2);
+    y2 = descobrePosI(y2);
+
+    aux = m[y1][x1];
+    m[y1][x1] = m[y2][x2];
+    m[y2][x2] = aux;
 }
 

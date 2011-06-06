@@ -125,7 +125,7 @@ void main()
                         }
                         else
                         {
-                            //trocaElementos(matriz, elem_x, elem_y, x, y);
+                            trocaElementos(matriz, elem_x, elem_y, x, y);
 
                             cursorSelecao = 0;
                             cursorTrava = 0;
