@@ -10,6 +10,9 @@ void main()
     char a; // usada na captura das teclas durante o jogo
     char sair; // usada para sair do laço do jogo
     int tempo, tempoTeste1, tempoTeste2; // usadas para controlar o tempo
+    char cursorSelecao; // usada para selecionar os elementos
+    char cursorTrava;
+    int elem_x, elem_y; // posicao do elemento selecionado
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -35,6 +38,10 @@ void main()
             tempo = TEMPO_INICIAL;
             tempoTeste1 = time(NULL);
             tempoTeste2 = time(NULL);
+            cursorSelecao = 0;
+            cursorTrava = 0;
+            elem_x = LIM_MIN_X;
+            elem_y = LIM_MIN_Y;
 
             //inicializando matriz do jogo
             iniciaMatriz(matriz);
@@ -67,7 +74,7 @@ void main()
                     for(j=0, mat_x=LIM_MIN_X+6; j<COLUNA; j++, mat_x=mat_x+3)
                     {
                         // imprime o cursor do jogador
-                        if(mat_x==x && mat_y==y)
+                        if( (mat_x==x && mat_y==y) || (mat_x==elem_x && mat_y==elem_y) )
                         {
                             textbackground(DARKGRAY);
                         }
@@ -111,8 +118,34 @@ void main()
                             x = x-3;
                         }
                         break;
+                    case 32: // espaço
+                        if(cursorSelecao==0)
+                        {
+                            cursorSelecao = 1;
+                        }
+                        else
+                        {
+                            //trocaElementos(matriz, elem_x, elem_y, x, y);
+
+                            cursorSelecao = 0;
+                            cursorTrava = 0;
+                            elem_x = LIM_MIN_X;
+                            elem_y = LIM_MIN_Y;
+                        }
+                        break;
                     }
                 }
+
+                if(cursorSelecao)
+                {
+                    if(cursorTrava==0)
+                    {
+                        elem_x = x;
+                        elem_y = y;
+                        cursorTrava = 1;
+                    }
+                }
+
                 textcolor(LIGHTGRAY);
                 textbackground(BLACK);
             }
