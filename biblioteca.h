@@ -6,6 +6,8 @@
 #define LINHA 8 //Tamanho das linhas
 #define COLUNA 8 //Tamanho das colunas
 
+#define TEMPO_INICIAL 120 // Tempo inicial do jogo em segundos
+
 //Caracteres das frutas
 #define FRUTA_0 14
 #define FRUTA_1 3
