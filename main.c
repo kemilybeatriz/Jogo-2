@@ -2,10 +2,12 @@
 
 void main()
 {
-    int matriz[LINHA][COLUNA];
-    char opcao;
+    int matriz[LINHA][COLUNA]; // matriz do jogo
+    int i, j; // usadas para percorrer a matriz
+    int x, y; // usadas para posicionar cada item da matriz
+    char opcao; // usada para o menu
     char sair;
-    int tempo, tempoTeste1, tempoTeste2;
+    int tempo, tempoTeste1, tempoTeste2; // usadas para controlar o tempo
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -30,6 +32,11 @@ void main()
             tempoTeste1 = time(NULL);
             tempoTeste2 = time(NULL);
 
+            //inicializando matriz do jogo
+            iniciaMatriz(matriz);
+
+            bordasJogo();
+
             // laço para o jogo; só sai quando 'sair' receber 1
             do
             {
@@ -46,16 +53,51 @@ void main()
                     sair = 1;
                 }
 
-                printf("%ds", tempo);
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
+                printf("Tempo: %ds  ", tempo);
 
-                system("cls");
+                for(i=0, x=LIM_MIN_X+6; i<LINHA; i++, x=x+3)
+                {
+                    for(j=0, y=LIM_MIN_Y+3; j<COLUNA; j++, y=y+2)
+                    {
+                        gotoxy(x, y);
+                        if(matriz[i][j] == 0)
+                        {
+                            textcolor(LIGHTGREEN);
+                            printf("%c", FRUTA_0);
+                        }
+                        else if(matriz[i][j] == 1)
+                        {
+                            textcolor(LIGHTRED);
+                            printf("%c", FRUTA_1);
+                        }
+
+                        else if(matriz[i][j] == 2)
+                        {
+                            textcolor(LIGHTCYAN);
+                            printf("%c", FRUTA_2);
+                        }
+                        else if(matriz[i][j] == 3)
+                        {
+                            textcolor(LIGHTMAGENTA);
+                            printf("%c", FRUTA_3);
+                        }
+                        else if(matriz[i][j] == 4)
+                        {
+                            textcolor(YELLOW);
+                            printf("%c", FRUTA_4);
+                        }
+                        textcolor(LIGHTGRAY);
+                    }
+                }
+
+                //iniciaMatriz(matriz);
+                //exibeCenario(matriz);
+                //bordasJogo();
+
+                //system("cls");
             }
             while(sair==0);
-
-            //sorteiaFrutas(matriz);
-            //exibeCenario(matriz);
-            fflush(stdin);
-            getchar();
             break;
         case '3': // Sai do jogo
             printf("Saindo...");
