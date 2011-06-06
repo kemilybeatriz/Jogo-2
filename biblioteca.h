@@ -3,8 +3,8 @@
 #include <time.h>
 #include "janelas.h"
 
-#define LINHA 8 //Tamanho das linhas
-#define COLUNA 8 //Tamanho das colunas
+#define LINHA 8 // número de linhas
+#define COLUNA 8 // número de colunas
 
 // Limites
 #define LIM_MIN_X 2
@@ -33,6 +33,9 @@ void menu();
 void bordasJogo();
 void iniciaMatriz(int m[LINHA][COLUNA]);
 void fazVarredura(int m[LINHA][COLUNA]);
+int descobrePosJ(int x);
+int descobrePosI(int y);
+void exibeElemento(int elemento, int x, int y);
 
 void menu()
 {
@@ -91,14 +94,34 @@ void bordasJogo()
 
 void iniciaMatriz(int m[LINHA][COLUNA])
 {
-    int i, j;
+    int i, j, x;
 
     srand(time(NULL));
     for(i=0; i<LINHA; i++)
     {
         for(j=0; j<COLUNA; j++)
         {
-            m[i][j] = rand()%5;
+            x = rand()%5;
+            if(x == 0)
+            {
+                m[i][j] = FRUTA_0;
+            }
+            else if(x == 1)
+            {
+                m[i][j] = FRUTA_1;
+            }
+            else if(x == 2)
+            {
+                m[i][j] = FRUTA_2;
+            }
+            else if(x == 3)
+            {
+                m[i][j] = FRUTA_3;
+            }
+            else if(x == 4)
+            {
+                m[i][j] = FRUTA_4;
+            }
         }
     }
 }
@@ -106,5 +129,58 @@ void iniciaMatriz(int m[LINHA][COLUNA])
 void fazVarredura(int m[LINHA][COLUNA])
 {
 
+}
+
+int descobrePosJ(int x)
+{
+    int i, j;
+    for(i=0, j=LIM_MIN_X+6; i<LINHA; i++, j=j+3)
+    {
+        if(j==x)
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
+int descobrePosI(int y)
+{
+    int i, j;
+    for(i=0, j=LIM_MIN_Y+3; i<COLUNA; i++, j=j+2)
+    {
+        if(j==y)
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
+void exibeElemento(int elemento, int x, int y)
+{
+    if(elemento == FRUTA_0)
+    {
+        textcolor(LIGHTGREEN);
+    }
+    else if(elemento == FRUTA_1)
+    {
+        textcolor(LIGHTRED);
+    }
+    else if(elemento == FRUTA_2)
+    {
+        textcolor(LIGHTCYAN);
+    }
+    else if(elemento == FRUTA_3)
+    {
+        textcolor(LIGHTMAGENTA);
+    }
+    else if(elemento == FRUTA_4)
+    {
+        textcolor(YELLOW);
+    }
+    gotoxy(x, y);
+    printf("%c", elemento);
+    textcolor(LIGHTGRAY);
 }
 

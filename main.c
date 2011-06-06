@@ -59,11 +59,14 @@ void main()
                 gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
                 printf("Tempo: %ds  ", tempo);
 
-                for(i=0, mat_x=LIM_MIN_X+6; i<LINHA; i++, mat_x=mat_x+3)
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+3);
+                printf("matriz[%d][%d]: %c", descobrePosI(y), descobrePosJ(x), matriz[descobrePosI(y)][descobrePosJ(x)]);
+
+                for(i=0, mat_y=LIM_MIN_Y+3; i<LINHA; i++, mat_y=mat_y+2)
                 {
-                    for(j=0, mat_y=LIM_MIN_Y+3; j<COLUNA; j++, mat_y=mat_y+2)
+                    for(j=0, mat_x=LIM_MIN_X+6; j<COLUNA; j++, mat_x=mat_x+3)
                     {
-                        gotoxy(mat_x, mat_y);
+                        // imprime o cursor do jogador
                         if(mat_x==x && mat_y==y)
                         {
                             textbackground(DARKGRAY);
@@ -72,33 +75,8 @@ void main()
                         {
                             textbackground(BLACK);
                         }
-                        if(matriz[i][j] == 0)
-                        {
-                            textcolor(LIGHTGREEN);
-                            printf("%c", FRUTA_0);
-                        }
-                        else if(matriz[i][j] == 1)
-                        {
-                            textcolor(LIGHTRED);
-                            printf("%c", FRUTA_1);
-                        }
-
-                        else if(matriz[i][j] == 2)
-                        {
-                            textcolor(LIGHTCYAN);
-                            printf("%c", FRUTA_2);
-                        }
-                        else if(matriz[i][j] == 3)
-                        {
-                            textcolor(LIGHTMAGENTA);
-                            printf("%c", FRUTA_3);
-                        }
-                        else if(matriz[i][j] == 4)
-                        {
-                            textcolor(YELLOW);
-                            printf("%c", FRUTA_4);
-                        }
-                        textcolor(LIGHTGRAY);
+                        // imprime o elemento da matriz
+                        exibeElemento(matriz[i][j], mat_x, mat_y);
                     }
                 }
 
@@ -135,12 +113,6 @@ void main()
                         break;
                     }
                 }
-
-                // imprime o cursor do jogador
-                textbackground(DARKGRAY);
-                gotoxy(x, y);
-                printf("%c", 32);
-
                 textcolor(LIGHTGRAY);
                 textbackground(BLACK);
             }
