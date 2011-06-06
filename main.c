@@ -4,9 +4,11 @@ void main()
 {
     int matriz[LINHA][COLUNA]; // matriz do jogo
     int i, j; // usadas para percorrer a matriz
-    int x, y; // usadas para posicionar cada item da matriz
+    int mat_x, mat_y; // usadas para posicionar cada item da matriz
+    int x, y; // usadas para posicionar o cursor do jogador
     char opcao; // usada para o menu
-    char sair;
+    char a; // usada na captura das teclas durante o jogo
+    char sair; // usada para sair do laço do jogo
     int tempo, tempoTeste1, tempoTeste2; // usadas para controlar o tempo
 
     // define o titulo da janela
@@ -27,6 +29,8 @@ void main()
             system("cls");
 
             // inicializando variáveis
+            x = LIM_MIN_X+6;
+            y = LIM_MIN_Y+3;
             sair = 0;
             tempo = TEMPO_INICIAL;
             tempoTeste1 = time(NULL);
@@ -40,6 +44,10 @@ void main()
             // laço para o jogo; só sai quando 'sair' receber 1
             do
             {
+                if(tempo==0)
+                {
+                    sair = 1;
+                }
                 // decrementa a variável 'tempo' a cada segundo
                 if(tempoTeste1!=tempoTeste2)
                 {
@@ -48,19 +56,22 @@ void main()
                 }
                 tempoTeste1 = time(NULL);
 
-                if(tempo==0)
-                {
-                    sair = 1;
-                }
-
                 gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
                 printf("Tempo: %ds  ", tempo);
 
-                for(i=0, x=LIM_MIN_X+6; i<LINHA; i++, x=x+3)
+                for(i=0, mat_x=LIM_MIN_X+6; i<LINHA; i++, mat_x=mat_x+3)
                 {
-                    for(j=0, y=LIM_MIN_Y+3; j<COLUNA; j++, y=y+2)
+                    for(j=0, mat_y=LIM_MIN_Y+3; j<COLUNA; j++, mat_y=mat_y+2)
                     {
-                        gotoxy(x, y);
+                        gotoxy(mat_x, mat_y);
+                        if(mat_x==x && mat_y==y)
+                        {
+                            textbackground(DARKGRAY);
+                        }
+                        else
+                        {
+                            textbackground(BLACK);
+                        }
                         if(matriz[i][j] == 0)
                         {
                             textcolor(LIGHTGREEN);
@@ -91,11 +102,47 @@ void main()
                     }
                 }
 
-                //iniciaMatriz(matriz);
-                //exibeCenario(matriz);
-                //bordasJogo();
+                fflush(stdin);
+                if (kbhit()) // se alguma tecla for pressionada
+                {
+                    fflush(stdin);
+                    a = getch(); // pega mais uma...
+                    switch (a)
+                    {
+                    case 72: // seta para cima
+                        if( y>=LIM_MIN_Y+5 && y<=LIM_MAX_Y-2 )
+                        {
+                            y = y-2;
+                        }
+                        break;
+                    case 80: // seta para baixo
+                        if( y>=LIM_MIN_Y+3 && y<=LIM_MAX_Y-4 )
+                        {
+                            y = y+2;
+                        }
+                        break;
+                    case 77: // seta direita
+                        if( x>=LIM_MIN_X+6 && x<=LIM_MAX_X-6 )
+                        {
+                            x = x+3;
+                        }
+                        break;
+                    case 75: // seta esquerda
+                        if( x>=LIM_MIN_X+9 && x<=LIM_MAX_X-3 )
+                        {
+                            x = x-3;
+                        }
+                        break;
+                    }
+                }
 
-                //system("cls");
+                // imprime o cursor do jogador
+                textbackground(DARKGRAY);
+                gotoxy(x, y);
+                printf("%c", 32);
+
+                textcolor(LIGHTGRAY);
+                textbackground(BLACK);
             }
             while(sair==0);
             break;

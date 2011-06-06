@@ -98,7 +98,7 @@ void iniciaMatriz(int m[LINHA][COLUNA])
     {
         for(j=0; j<COLUNA; j++)
         {
-            m[i][j]= rand()%5;
+            m[i][j] = rand()%5;
         }
     }
 }
