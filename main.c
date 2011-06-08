@@ -46,6 +46,9 @@ void main()
             //inicializando matriz do jogo
             iniciaMatriz(matriz);
 
+            gotoxy(LIM_MAX_X+2, LIM_MIN_Y+5);
+            printf("%d", fazVarredura(matriz));
+
             bordasJogo();
 
             // laço para o jogo; só sai quando 'sair' receber 1
@@ -68,6 +71,9 @@ void main()
 
                 gotoxy(LIM_MAX_X+2, LIM_MIN_Y+3);
                 printf("matriz[%d][%d]: %c", descobrePosI(y), descobrePosJ(x), matriz[descobrePosI(y)][descobrePosJ(x)]);
+
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+5);
+                printf("%d", fazVarredura(matriz));
 
                 for(i=0, mat_y=LIM_MIN_Y+3; i<LINHA; i++, mat_y=mat_y+2)
                 {
@@ -135,6 +141,9 @@ void main()
                             elem_x = LIM_MIN_X;
                             elem_y = LIM_MIN_Y;
                         }
+                        break;
+                    case 27: // botão ESC para sair
+                        sair = 1;
                         break;
                     }
                 }

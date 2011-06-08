@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <conio.h>
 #include "janelas.h"
 
 #define LINHA 8 // número de linhas
@@ -32,7 +33,7 @@
 void menu();
 void bordasJogo();
 void iniciaMatriz(int m[LINHA][COLUNA]);
-void fazVarredura(int m[LINHA][COLUNA]);
+int fazVarredura(int m[LINHA][COLUNA]);
 int descobrePosJ(int x);
 int descobrePosI(int y);
 void exibeElemento(int elemento, int x, int y);
@@ -127,9 +128,77 @@ void iniciaMatriz(int m[LINHA][COLUNA])
     }
 }
 
-void fazVarredura(int m[LINHA][COLUNA])
+int fazVarredura(int m[LINHA][COLUNA])
 {
+    int i, j;
+    int a, b, c;
+    int aux, cont, cont2=0, cont3=0;
 
+    // faz a varredura horizontal
+    for(i=0; i<LINHA; i++)
+    {
+        cont = 0;
+        aux = m[i][0];
+        a = 0;
+        for(j=1; j<COLUNA; j++)
+        {
+            if( aux == m[i][j] )
+            {
+                cont2++;
+                cont++;
+                if( (j+1==COLUNA) && (cont>=2) )
+                {
+                    cont3++;
+                }
+            }
+            else
+            {
+                if(cont>=2)
+                {
+                    cont3++;
+                    if( i>0 )
+                    {
+                        for(b=j-1; b>=a; b--)
+                        {
+                            for(c=i; c>0; c--)
+                            {
+                                m[c][b] = m[c-1][b];
+                            }
+                        }
+                    }
+                    for(b=j-1; b>=a; b--)
+                    {
+                        m[0][b] = 0;
+                    }
+
+                }
+                cont = 0;
+                aux = m[i][j];
+                a = j;
+            }
+        }
+    }
+    // faz a varredura vertical
+    /*for(j=0; j<COLUNA; j++)
+    {
+        cont = 0;
+        aux = m[0][j];
+        for(i=1; i<LINHA; i++)
+        {
+            if( aux == m[i][j] )
+            {
+                cont++;
+                cont2++;
+            }
+            else
+            {
+                cont = 0;
+                aux = m[i][j];
+            }
+        }
+    }*/
+
+    return cont3;
 }
 
 int descobrePosJ(int x)
