@@ -43,11 +43,12 @@ void main()
             elem_x = LIM_MIN_X;
             elem_y = LIM_MIN_Y;
 
+            printf("Carregando...");
+
             //inicializando matriz do jogo
             iniciaMatriz(matriz);
 
-            gotoxy(LIM_MAX_X+2, LIM_MIN_Y+5);
-            printf("%d", fazVarredura(matriz));
+            system("cls");
 
             bordasJogo();
 

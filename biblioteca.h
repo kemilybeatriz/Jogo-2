@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <conio.h>
@@ -38,6 +39,7 @@ int descobrePosJ(int x);
 int descobrePosI(int y);
 void exibeElemento(int elemento, int x, int y);
 void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
+int sorteiaElemento();
 
 void menu()
 {
@@ -81,7 +83,7 @@ void bordasJogo()
     gotoxy(i, LIM_MAX_Y);
     printf("%c", BORDA_INF_DIREITA);
 
-    // Imprime índices
+    // Imprime índices do jogo
     for(i=LIM_MIN_X+6, j=65; j<65+LINHA; i=i+3, j++)
     {
         gotoxy(i, LIM_MIN_Y+1);
@@ -96,34 +98,15 @@ void bordasJogo()
 
 void iniciaMatriz(int m[LINHA][COLUNA])
 {
-    int i, j, x;
+    int i, j;
 
-    srand(time(NULL));
     for(i=0; i<LINHA; i++)
     {
         for(j=0; j<COLUNA; j++)
         {
-            x = rand()%5;
-            if(x == 0)
-            {
-                m[i][j] = FRUTA_0;
-            }
-            else if(x == 1)
-            {
-                m[i][j] = FRUTA_1;
-            }
-            else if(x == 2)
-            {
-                m[i][j] = FRUTA_2;
-            }
-            else if(x == 3)
-            {
-                m[i][j] = FRUTA_3;
-            }
-            else if(x == 4)
-            {
-                m[i][j] = FRUTA_4;
-            }
+            m[i][j] = sorteiaElemento();
+            // aguarda 20ms para que não sorteie o mesmo elemento
+            Sleep(20);
         }
     }
 }
@@ -144,20 +127,52 @@ int fazVarredura(int m[LINHA][COLUNA])
         {
             if( aux == m[i][j] )
             {
-                cont2++;
                 cont++;
+                // para quando a combinaçao estiver na ultima coluna
                 if( (j+1==COLUNA) && (cont>=2) )
                 {
-                    cont3++;
+                    if( i>0 )
+                    {
+                        // faz elementos descerem uma posição
+                        for(b=j; b>=a; b--)
+                        {
+                            for(c=i; c>0; c--)
+                            {
+                                m[c][b] = m[c-1][b];
+                            }
+                        }
+                    }
+                    // sorteia elementos para a primeira linha
+                    for(b=j; b>=a; b--)
+                    {
+                        // só sai do laço se não for repetido
+                        if(b==j) // caso seja a ultima coluna
+                        {
+                            do
+                            {
+                                m[0][b] = sorteiaElemento();
+                            }
+                            while( m[0][b]==m[1][b] );
+                        }
+                        else
+                        {
+                            do
+                            {
+                                m[0][b] = sorteiaElemento();
+                            }
+                            while( m[0][b]==m[0][b+1] || m[0][b]==m[1][b] );
+                        }
+                    }
                 }
             }
             else
             {
+                // se houver alguma combinacao
                 if(cont>=2)
                 {
-                    cont3++;
                     if( i>0 )
                     {
+                        // faz elementos descerem uma posição
                         for(b=j-1; b>=a; b--)
                         {
                             for(c=i; c>0; c--)
@@ -166,11 +181,16 @@ int fazVarredura(int m[LINHA][COLUNA])
                             }
                         }
                     }
+                    // sorteia elementos para a primeira linha
                     for(b=j-1; b>=a; b--)
                     {
-                        m[0][b] = 0;
+                        // só sai do laço se não for repetido
+                        do
+                        {
+                            m[0][b] = sorteiaElemento();
+                        }
+                        while( m[0][b]==m[0][b+1] || m[0][b]==m[1][b] );
                     }
-
                 }
                 cont = 0;
                 aux = m[i][j];
@@ -179,10 +199,11 @@ int fazVarredura(int m[LINHA][COLUNA])
         }
     }
     // faz a varredura vertical
-    /*for(j=0; j<COLUNA; j++)
+    for(j=0; j<COLUNA; j++)
     {
         cont = 0;
         aux = m[0][j];
+        a = 0;
         for(i=1; i<LINHA; i++)
         {
             if( aux == m[i][j] )
@@ -192,14 +213,36 @@ int fazVarredura(int m[LINHA][COLUNA])
             }
             else
             {
+                // se houver alguma combinacao
+                if(cont>=2)
+                {
+                    /*if( i>0 )
+                    {
+                        // faz elementos descerem uma posição
+                        for(c=i-1; c>0; c--)
+                        {
+                            m[c][j] = m[c-1][j];
+                        }
+                    }
+                    // sorteia o elemento da primeira linha
+                    // só sai do laço se não for repetido
+                    do
+                    {
+                        m[0][j] = sorteiaElemento();
+                    }
+                    while( m[0][j]==m[0][b+1] || m[0][b]==m[1][b] );*/
+                    cont3++;
+                }
                 cont = 0;
                 aux = m[i][j];
+                a = i;
             }
         }
-    }*/
-
+    }
     return cont3;
 }
+
+
 
 int descobrePosJ(int x)
 {
@@ -229,25 +272,23 @@ int descobrePosI(int y)
 
 void exibeElemento(int elemento, int x, int y)
 {
-    if(elemento == FRUTA_0)
+    switch(elemento)
     {
+    case FRUTA_0:
         textcolor(LIGHTGREEN);
-    }
-    else if(elemento == FRUTA_1)
-    {
+        break;
+    case FRUTA_1:
         textcolor(LIGHTRED);
-    }
-    else if(elemento == FRUTA_2)
-    {
+        break;
+    case FRUTA_2:
         textcolor(LIGHTCYAN);
-    }
-    else if(elemento == FRUTA_3)
-    {
+        break;
+    case FRUTA_3:
         textcolor(LIGHTMAGENTA);
-    }
-    else if(elemento == FRUTA_4)
-    {
+        break;
+    case FRUTA_4:
         textcolor(YELLOW);
+        break;
     }
     gotoxy(x, y);
     printf("%c", elemento);
@@ -256,7 +297,7 @@ void exibeElemento(int elemento, int x, int y)
 
 void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
 {
-    int i, j, aux;
+    int aux;
 
     x1 = descobrePosJ(x1);
     y1 = descobrePosI(y1);
@@ -266,5 +307,28 @@ void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
     aux = m[y1][x1];
     m[y1][x1] = m[y2][x2];
     m[y2][x2] = aux;
+}
+
+int sorteiaElemento()
+{
+    // a função GetTickCount() da biblioteca windows.h
+    // possui uma resolução maior do que a time(NULL);
+
+    //srand( time(NULL) );
+    srand( GetTickCount() );
+
+    switch( rand()%5 )
+    {
+    case 0:
+        return FRUTA_0;
+    case 1:
+        return FRUTA_1;
+    case 2:
+        return FRUTA_2;
+    case 3:
+        return FRUTA_3;
+    case 4:
+        return FRUTA_4;
+    }
 }
 
