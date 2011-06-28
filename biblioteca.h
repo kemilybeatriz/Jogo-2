@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <conio.h>
+#include <windows.h>
 #include "janelas.h"
 
 #define LINHA 8 // número de linhas
@@ -16,7 +17,11 @@
 
 #define TEMPO_INICIAL 120 // Tempo inicial do jogo em segundos
 
-//Caracteres das frutas
+// constantes usadas na pontuação e no tempo
+#define CONST_PONTOS 100
+#define CONST_TEMPO 1
+
+// caracteres das frutas
 #define FRUTA_0 14
 #define FRUTA_1 3
 #define FRUTA_2 4
@@ -39,13 +44,22 @@ int descobrePosJ(int x);
 int descobrePosI(int y);
 void exibeElemento(int elemento, int x, int y);
 void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
+int testaTroca(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
 int sorteiaElemento();
+void exibeInstrucoes();
+void sequenciaFrutas(int a);
 
 void menu()
 {
-    printf("1 - Instrucoes sobre a pontuacao\n");
+    sequenciaFrutas(1);
+    textcolor(WHITE);
+    printf(" PAPAGAIO SEDENTO");
+    sequenciaFrutas(1);
+    textcolor(LIGHTGRAY);
+
+    printf("\n\n1 - Instrucoes sobre a pontuacao\n");
     printf("2 - Iniciar jogo\n");
-    printf("3 - Sair\n");
+    printf("3 - Sair\n\n");
 }
 
 void bordasJogo()
@@ -99,6 +113,7 @@ void bordasJogo()
 void iniciaMatriz(int m[LINHA][COLUNA])
 {
     int i, j;
+    int a;
 
     for(i=0; i<LINHA; i++)
     {
@@ -109,13 +124,20 @@ void iniciaMatriz(int m[LINHA][COLUNA])
             Sleep(20);
         }
     }
+    // garante que nao sobrara nenhuma combinacao
+    do
+    {
+        a = fazVarredura(m);
+    }
+    while(a);
 }
 
 int fazVarredura(int m[LINHA][COLUNA])
 {
     int i, j;
     int a, b, c;
-    int aux, cont, cont2=0, cont3=0;
+    int aux, cont;
+    int pontos = 0;
 
     // faz a varredura horizontal
     for(i=0; i<LINHA; i++)
@@ -131,6 +153,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                 // para quando a combinaçao estiver na ultima coluna
                 if( (j+1==COLUNA) && (cont>=2) )
                 {
+                    pontos = pontos + cont + 1;
                     if( i>0 )
                     {
                         // faz elementos descerem uma posição
@@ -170,6 +193,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                 // se houver alguma combinacao
                 if(cont>=2)
                 {
+                    pontos = pontos + cont + 1;
                     if( i>0 )
                     {
                         // faz elementos descerem uma posição
@@ -198,6 +222,7 @@ int fazVarredura(int m[LINHA][COLUNA])
             }
         }
     }
+
     // faz a varredura vertical
     for(j=0; j<COLUNA; j++)
     {
@@ -209,29 +234,54 @@ int fazVarredura(int m[LINHA][COLUNA])
             if( aux == m[i][j] )
             {
                 cont++;
-                cont2++;
+                // para quando a combinaçao estiver na ultima linha
+                if( (i+1==LINHA) && (cont>=2) )
+                {
+                    pontos = pontos + cont + 1;
+                    if(a>0)
+                    {
+                        // faz elementos descerem uma posição
+                        for(b=a-1; b>=0; b--)
+                        {
+                            m[b+(cont+1)][j] = m[b][j];
+                        }
+                    }
+                    // sorteia os elementos no topo
+                    for(b=cont; b>=0; b--)
+                    {
+                        // só sai do laço se não forem repetidos
+                        do
+                        {
+                            m[b][j] = sorteiaElemento();
+                        }
+                        while( m[b][j]==m[b][j+1] || m[b][j]==m[b+1][j] );
+                    }
+                }
             }
             else
             {
                 // se houver alguma combinacao
                 if(cont>=2)
                 {
-                    /*if( i>0 )
+                    pontos = pontos + cont + 1;
+                    if(a>0)
                     {
                         // faz elementos descerem uma posição
-                        for(c=i-1; c>0; c--)
+                        for(b=a-1; b>=0; b--)
                         {
-                            m[c][j] = m[c-1][j];
+                            m[b+(cont+1)][j] = m[b][j];
                         }
                     }
-                    // sorteia o elemento da primeira linha
-                    // só sai do laço se não for repetido
-                    do
+                    // sorteia os elementos no topo
+                    for(b=cont; b>=0; b--)
                     {
-                        m[0][j] = sorteiaElemento();
+                        // só sai do laço se não forem repetidos
+                        do
+                        {
+                            m[b][j] = sorteiaElemento();
+                        }
+                        while( m[b][j]==m[b][j+1] || m[b][j]==m[b+1][j] );
                     }
-                    while( m[0][j]==m[0][b+1] || m[0][b]==m[1][b] );*/
-                    cont3++;
                 }
                 cont = 0;
                 aux = m[i][j];
@@ -239,7 +289,7 @@ int fazVarredura(int m[LINHA][COLUNA])
             }
         }
     }
-    return cont3;
+    return pontos;
 }
 
 
@@ -309,6 +359,24 @@ void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
     m[y2][x2] = aux;
 }
 
+int testaTroca(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
+{
+    if(
+        // só permite trocar com o elemento vizinho
+        (x2==x1-3 && y2==y1) ||
+        (x2==x1+3 && y2==y1) ||
+        (x2==x1 && y2==y1-2) ||
+        (x2==x1 && y2==y1+2)
+    )
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 int sorteiaElemento()
 {
     // a função GetTickCount() da biblioteca windows.h
@@ -330,5 +398,55 @@ int sorteiaElemento()
     case 4:
         return FRUTA_4;
     }
+}
+
+void exibeInstrucoes()
+{
+    sequenciaFrutas(2);
+    textcolor(WHITE);
+    printf(" INSTRUCOES");
+    sequenciaFrutas(2);
+
+    textcolor(LIGHTGRAY);
+    printf("\n\nO objetivo do jogo e fazer combinacoes de 3 ou mais frutas\n");
+    printf("iguais, tanto em linha quanto em coluna usando as setas do\n");
+    printf("teclado para mover o cursor e a tecla espaco para trocar as\n");
+    printf("frutas de lugar. A fruta somente pode ser movida para uma\n");
+    printf("posicao a sua esquerda ou a sua direita ou uma posicao para\n");
+    printf("cima ou para baixo. O tempo inicia-se em %d segundos e vai\n", TEMPO_INICIAL);
+    printf("decrementando ate chegar em zero. A medida que as combinacoes sao\n");
+    printf("feitas, o tempo e incrementado em %d segundos para cada fruta\n", CONST_TEMPO);
+    printf("combinada. Para sair do jogo e voltar ao menu principal,\n");
+    printf("pressione ESC.\n\n");
+
+    printf("Pontuacao:\n");
+    printf("Quanto maior a quantidade de frutas em cada combinacao, maior\n");
+    printf("a pontuacao do jogador.\n");
+    printf("A pontuacao de cada combinacao e definida pelo produto entre\n");
+    printf("a quantidade de frutas combinadas e %d.\n\n", CONST_PONTOS);
+
+    printf("Divirta-se!\n");
+}
+
+void sequenciaFrutas(int a)
+{
+    //mostra a sequencia de frutas
+    int i=0;
+    do
+    {
+        textcolor(LIGHTGREEN);
+        printf(" %c ", FRUTA_0);
+        textcolor(LIGHTRED);
+        printf("%c ", FRUTA_1);
+        textcolor(LIGHTCYAN);
+        printf("%c ", FRUTA_2);
+        textcolor(LIGHTMAGENTA);
+        printf("%c ", FRUTA_3);
+        textcolor(YELLOW);
+        printf("%c", FRUTA_4);
+        i++;
+    }
+    while(i<a);
+    textcolor(LIGHTGRAY);
 }
 

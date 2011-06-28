@@ -1,3 +1,17 @@
+/*
+UTFPR - UNIVERSIDADE TECNOLÓGICA FEDERAL DO PARANÁ
+        CURSO DE ENGENHARIA ELETRÔNICA
+
+Fundamentos de Programação I
+Trabalho 3 - Papagaio Sedento
+Professor: Ms Eng. Edson Tavares de Camargo
+
+Alunos:
+1168932 - Kemily Beatriz Rodrigues da Cruz Lopes
+1054112 - Maurício Meneghini Fauth
+
+*/
+
 #include "biblioteca.h"
 
 void main()
@@ -13,6 +27,7 @@ void main()
     char cursorSelecao; // usada para selecionar os elementos
     char cursorTrava;
     int elem_x, elem_y; // posicao do elemento selecionado
+    int varredura, pontos;
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -26,7 +41,8 @@ void main()
         switch(opcao)
         {
         case '1': // Exibe instruções sobre a pontuação
-            printf("Instrucoes");
+            system("cls");
+            exibeInstrucoes();
             break;
         case '2': // Inicia o jogo
             system("cls");
@@ -42,6 +58,10 @@ void main()
             cursorTrava = 0;
             elem_x = LIM_MIN_X;
             elem_y = LIM_MIN_Y;
+            pontos = 0;
+
+            textcolor(LIGHTGRAY);
+            textbackground(BLACK);
 
             printf("Carregando...");
 
@@ -68,13 +88,27 @@ void main()
                 tempoTeste1 = time(NULL);
 
                 gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
+                if(tempo%2)
+                {
+                    textcolor(LIGHTGREEN);
+                }
+                else
+                {
+                    textcolor(YELLOW);
+                }
+                printf("Papagaio Sedento");
+                textcolor(LIGHTGRAY);
+
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+4);
+                if(tempo<20)
+                {
+                    textcolor(LIGHTRED);
+                }
                 printf("Tempo: %ds  ", tempo);
+                textcolor(LIGHTGRAY);
 
-                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+3);
-                printf("matriz[%d][%d]: %c", descobrePosI(y), descobrePosJ(x), matriz[descobrePosI(y)][descobrePosJ(x)]);
-
-                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+5);
-                printf("%d", fazVarredura(matriz));
+                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+6);
+                printf("Pontos: %d", pontos);
 
                 for(i=0, mat_y=LIM_MIN_Y+3; i<LINHA; i++, mat_y=mat_y+2)
                 {
@@ -132,9 +166,16 @@ void main()
                         }
                         else
                         {
-                            if( (x==elem_x-3 && y==elem_y) || (x==elem_x+3 && y==elem_y) || (x==elem_x && y==elem_y-2) || (x==elem_x && y==elem_y+2) )
+                            if( testaTroca(matriz, elem_x, elem_y, x, y) )
                             {
                                 trocaElementos(matriz, elem_x, elem_y, x, y);
+                                do
+                                {
+                                    varredura = fazVarredura(matriz);
+                                    pontos = pontos + (varredura*CONST_PONTOS);
+                                    tempo = tempo + (varredura*CONST_TEMPO);
+                                }
+                                while(varredura);
                             }
 
                             cursorSelecao = 0;
@@ -163,6 +204,15 @@ void main()
                 textbackground(BLACK);
             }
             while(sair==0);
+            system("cls");
+            sequenciaFrutas(1);
+            textcolor(WHITE);
+            printf(" PAPAGAIO SEDENTO");
+            sequenciaFrutas(1);
+            textcolor(LIGHTRED);
+            printf("\n\n\t\tGAME OVER\n\n");
+            textcolor(LIGHTGRAY);
+            printf("\t\t%d pontos!\n", pontos);
             break;
         case '3': // Sai do jogo
             printf("Saindo...");
