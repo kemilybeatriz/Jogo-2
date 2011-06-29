@@ -30,9 +30,24 @@ void main()
     int tamanho = 8; // tamanho da matriz
     struct COORDENADA lim_min; // limite mínimo
     struct COORDENADA lim_max; // limite máximo
+    struct JOGADOR *top;
+    struct JOGADOR player;
 
     // define o titulo da janela
     system("title Papagaio Sedento");
+
+    top = malloc(NUM_JOGS * sizeof(struct JOGADOR));
+    if(!top)
+    {
+        printf("Erro ao alocar memoria!");
+        exit(1);
+    }
+
+    for(i=0; i<NUM_JOGS; i++)
+    {
+        strcpy( (top+i)->nome, "Jogador");
+        (top+i)->pontos = (i+1) * (i+1) * 300;
+    }
 
     do
     {
@@ -80,6 +95,12 @@ void main()
 
             system("cls");
 
+            fflush(stdin);
+            printf("Digite seu nome: ");
+            gets(player.nome);
+
+            system("cls");
+
             bordasJogo(tamanho);
 
             // laço para o jogo; só sai quando 'sair' receber 1
@@ -110,6 +131,9 @@ void main()
                 textcolor(LIGHTGRAY);
 
                 gotoxy(lim_max.x+2, lim_min.y+4);
+                puts(player.nome);
+
+                gotoxy(lim_max.x+2, lim_min.y+6);
                 if(tempo<20)
                 {
                     textcolor(LIGHTRED);
@@ -117,7 +141,7 @@ void main()
                 printf("Tempo: %ds  ", tempo);
                 textcolor(LIGHTGRAY);
 
-                gotoxy(lim_max.x+2, lim_min.y+6);
+                gotoxy(lim_max.x+2, lim_min.y+8);
                 printf("Pontos: %d", pontos);
 
                 for(i=0, mat.y=lim_min.y+3; i<tamanho; i++, mat.y=mat.y+2)
@@ -223,9 +247,18 @@ void main()
             printf("\n\n\t\tGAME OVER\n\n");
             textcolor(LIGHTGRAY);
             printf("\t\t%d pontos!\n", pontos);
+            player.pontos = pontos;
             free(matriz);
             break;
         case '3': // Ver ranking
+            system("cls");
+            sequenciaFrutas(1);
+            textcolor(WHITE);
+            printf(" PAPAGAIO SEDENTO");
+            sequenciaFrutas(1);
+            textcolor(LIGHTGRAY);
+            printf("\n\nTOP %d\n\n", NUM_JOGS);
+            verRank(top);
             break;
         case '4': // Determinar tamanho da matriz
             do
@@ -245,5 +278,6 @@ void main()
         getchar();
     }
     while(opcao!='5');
+    free(top);
 }
 

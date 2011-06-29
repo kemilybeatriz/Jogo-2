@@ -28,6 +28,7 @@
 #define BORDA_INF_DIREITA 188
 
 #define TAM_NOME 64
+#define NUM_JOGS 10
 
 struct COORDENADA
 {
@@ -54,6 +55,7 @@ int sorteiaElemento();
 void exibeInstrucoes();
 void sequenciaFrutas(int a);
 void calculaLimites(struct COORDENADA *lim_min, struct COORDENADA *lim_max, int tam);
+void verRank(struct JOGADOR *top);
 
 void menu()
 {
@@ -478,3 +480,12 @@ void calculaLimites(struct COORDENADA *lim_min, struct COORDENADA *lim_max, int 
     }
 }
 
+void verRank(struct JOGADOR *top)
+{
+    int i;
+    for(i=0; i<NUM_JOGS; i++)
+    {
+        printf("%2d - %d - ", i+1, (top+i)->pontos);
+        puts( (top+i)->nome );
+    }
+}
