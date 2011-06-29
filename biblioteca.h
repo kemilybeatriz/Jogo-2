@@ -6,15 +6,6 @@
 #include <windows.h>
 #include "janelas.h"
 
-//#define LINHA 8 // número de linhas
-//#define COLUNA 8 // número de colunas
-
-// Limites
-#define LIM_MIN_X 2
-#define LIM_MIN_Y 2
-#define LIM_MAX_X 32
-#define LIM_MAX_Y 21
-
 #define TEMPO_INICIAL 120 // Tempo inicial do jogo em segundos
 
 // constantes usadas na pontuação e no tempo
@@ -36,6 +27,12 @@
 #define BORDA_SUP_DIREITA 187
 #define BORDA_INF_DIREITA 188
 
+struct COORDENADA
+{
+    int x;
+    int y;
+};
+
 void menu();
 void bordasJogo(int tam);
 void iniciaMatriz(int *m, int tam);
@@ -48,6 +45,7 @@ int testaTroca(int x1, int y1, int x2, int y2);
 int sorteiaElemento();
 void exibeInstrucoes();
 void sequenciaFrutas(int a);
+void calculaLimites(struct COORDENADA *lim_min, struct COORDENADA *lim_max, int tam);
 
 void menu()
 {
@@ -67,47 +65,51 @@ void menu()
 void bordasJogo(int tam)
 {
     int i, j;
+    struct COORDENADA lim_min;
+    struct COORDENADA lim_max;
+
+    calculaLimites(&lim_min, &lim_max, tam);
 
     // Imprime a borda superior
-    gotoxy(LIM_MIN_X, LIM_MIN_Y);
+    gotoxy(lim_min.x, lim_min.y);
     printf("%c", BORDA_SUP_ESQUERDA);
-    for(i=LIM_MIN_X+1; i<LIM_MAX_X; i++)
+    for(i=lim_min.x+1; i<lim_max.x; i++)
     {
-        gotoxy(i, LIM_MIN_Y);
+        gotoxy(i, lim_min.y);
         printf("%c", BORDA_HORIZONTAL);
     }
-    gotoxy(i, LIM_MIN_Y);
+    gotoxy(i, lim_min.y);
     printf("%c", BORDA_SUP_DIREITA);
 
     // Imprime as bordas laterais
-    for(i=LIM_MIN_Y+1; i<LIM_MAX_Y; i++)
+    for(i=lim_min.y+1; i<lim_max.y; i++)
     {
-        gotoxy(LIM_MIN_X, i);
+        gotoxy(lim_min.x, i);
         printf("%c", BORDA_VERTICAL);
-        gotoxy(LIM_MAX_X, i);
+        gotoxy(lim_max.x, i);
         printf("%c", BORDA_VERTICAL);
     }
 
     // Imprime a borda inferior
-    gotoxy(LIM_MIN_X, LIM_MAX_Y);
+    gotoxy(lim_min.x, lim_max.y);
     printf("%c", BORDA_INF_ESQUERDA);
-    for(i=LIM_MIN_X+1; i<LIM_MAX_X; i++)
+    for(i=lim_min.x+1; i<lim_max.x; i++)
     {
-        gotoxy(i, LIM_MAX_Y);
+        gotoxy(i, lim_max.y);
         printf("%c", BORDA_HORIZONTAL);
     }
-    gotoxy(i, LIM_MAX_Y);
+    gotoxy(i, lim_max.y);
     printf("%c", BORDA_INF_DIREITA);
 
     // Imprime índices do jogo
-    for(i=LIM_MIN_X+6, j=65; j<65+tam; i=i+3, j++)
+    for(i=lim_min.x+6, j=65; j<65+tam; i=i+3, j++)
     {
-        gotoxy(i, LIM_MIN_Y+1);
+        gotoxy(i, lim_min.y+1);
         printf("%c", j);
     }
-    for(i=LIM_MIN_Y+3, j=1; j<1+tam; i=i+2, j++)
+    for(i=lim_min.y+3, j=1; j<1+tam; i=i+2, j++)
     {
-        gotoxy(LIM_MIN_X+2, i);
+        gotoxy(lim_min.x+2, i);
         printf("%d", j);
     }
 }
@@ -296,7 +298,11 @@ int fazVarredura(int *m, int tam)
 int descobrePosJ(int x, int tam)
 {
     int i, j;
-    for(i=0, j=LIM_MIN_X+6; i<tam; i++, j=j+3)
+    struct COORDENADA lim_min;
+
+    calculaLimites(&lim_min, NULL, tam);
+
+    for(i=0, j=lim_min.x+6; i<tam; i++, j=j+3)
     {
         if(j==x)
         {
@@ -309,7 +315,11 @@ int descobrePosJ(int x, int tam)
 int descobrePosI(int y, int tam)
 {
     int i, j;
-    for(i=0, j=LIM_MIN_Y+3; i<tam; i++, j=j+2)
+    struct COORDENADA lim_min;
+
+    calculaLimites(&lim_min, NULL, tam);
+
+    for(i=0, j=lim_min.y+3; i<tam; i++, j=j+2)
     {
         if(j==y)
         {
@@ -447,5 +457,16 @@ void sequenciaFrutas(int a)
     }
     while(i<a);
     textcolor(LIGHTGRAY);
+}
+
+void calculaLimites(struct COORDENADA *lim_min, struct COORDENADA *lim_max, int tam)
+{
+    lim_min->x = 2;
+    lim_min->y = 2;
+    if(lim_max)
+    {
+        lim_max->x = lim_min->x+6+3*tam;
+        lim_max->y = lim_min->y+3+2*tam;
+    }
 }
 

@@ -9,7 +9,6 @@ Professor: Ms Eng. Edson Tavares de Camargo
 Alunos:
 1168932 - Kemily Beatriz Rodrigues da Cruz Lopes
 1054112 - Maurício Meneghini Fauth
-
 */
 
 #include "biblioteca.h"
@@ -29,6 +28,8 @@ void main()
     int elem_x, elem_y; // posicao do elemento selecionado
     int varredura, pontos;
     int tamanho = 8; // tamanho da matriz
+    struct COORDENADA lim_min;
+    struct COORDENADA lim_max;
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -56,16 +57,17 @@ void main()
             }
 
             // inicializando variáveis
-            x = LIM_MIN_X+6;
-            y = LIM_MIN_Y+3;
+            calculaLimites(&lim_min, &lim_max, tamanho);
+            x = lim_min.x+6;
+            y = lim_min.y+3;
             sair = 0;
             tempo = TEMPO_INICIAL;
             tempoTeste1 = time(NULL);
             tempoTeste2 = time(NULL);
             cursorSelecao = 0;
             cursorTrava = 0;
-            elem_x = LIM_MIN_X;
-            elem_y = LIM_MIN_Y;
+            elem_x = lim_min.x;
+            elem_y = lim_min.y;
             pontos = 0;
 
             textcolor(LIGHTGRAY);
@@ -95,7 +97,7 @@ void main()
                 }
                 tempoTeste1 = time(NULL);
 
-                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+1);
+                gotoxy(lim_max.x+2, lim_min.y+1);
                 if(tempo%2)
                 {
                     textcolor(LIGHTGREEN);
@@ -107,7 +109,7 @@ void main()
                 printf("Papagaio Sedento");
                 textcolor(LIGHTGRAY);
 
-                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+4);
+                gotoxy(lim_max.x+2, lim_min.y+4);
                 if(tempo<20)
                 {
                     textcolor(LIGHTRED);
@@ -115,12 +117,12 @@ void main()
                 printf("Tempo: %ds  ", tempo);
                 textcolor(LIGHTGRAY);
 
-                gotoxy(LIM_MAX_X+2, LIM_MIN_Y+6);
+                gotoxy(lim_max.x+2, lim_min.y+6);
                 printf("Pontos: %d", pontos);
 
-                for(i=0, mat_y=LIM_MIN_Y+3; i<tamanho; i++, mat_y=mat_y+2)
+                for(i=0, mat_y=lim_min.y+3; i<tamanho; i++, mat_y=mat_y+2)
                 {
-                    for(j=0, mat_x=LIM_MIN_X+6; j<tamanho; j++, mat_x=mat_x+3)
+                    for(j=0, mat_x=lim_min.x+6; j<tamanho; j++, mat_x=mat_x+3)
                     {
                         // imprime o cursor do jogador
                         if( (mat_x==x && mat_y==y) || (mat_x==elem_x && mat_y==elem_y) )
@@ -144,25 +146,25 @@ void main()
                     switch (a)
                     {
                     case 72: // seta para cima
-                        if( y>=LIM_MIN_Y+5 && y<=LIM_MAX_Y-2 )
+                        if( y>=lim_min.y+5 && y<=lim_max.y-2 )
                         {
                             y = y-2;
                         }
                         break;
                     case 80: // seta para baixo
-                        if( y>=LIM_MIN_Y+3 && y<=LIM_MAX_Y-4 )
+                        if( y>=lim_min.y+3 && y<=lim_max.y-4 )
                         {
                             y = y+2;
                         }
                         break;
                     case 77: // seta direita
-                        if( x>=LIM_MIN_X+6 && x<=LIM_MAX_X-6 )
+                        if( x>=lim_min.x+6 && x<=lim_max.x-6 )
                         {
                             x = x+3;
                         }
                         break;
                     case 75: // seta esquerda
-                        if( x>=LIM_MIN_X+9 && x<=LIM_MAX_X-3 )
+                        if( x>=lim_min.x+9 && x<=lim_max.x-3 )
                         {
                             x = x-3;
                         }
@@ -188,8 +190,8 @@ void main()
 
                             cursorSelecao = 0;
                             cursorTrava = 0;
-                            elem_x = LIM_MIN_X;
-                            elem_y = LIM_MIN_Y;
+                            elem_x = lim_min.x;
+                            elem_y = lim_min.y;
                         }
                         break;
                     case 27: // botão ESC para sair
