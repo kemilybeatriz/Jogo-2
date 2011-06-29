@@ -16,7 +16,7 @@ Alunos:
 
 void main()
 {
-    int matriz[LINHA][COLUNA]; // matriz do jogo
+    int *matriz; // matriz do jogo
     int i, j; // usadas para percorrer a matriz
     int mat_x, mat_y; // usadas para posicionar cada item da matriz
     int x, y; // usadas para posicionar o cursor do jogador
@@ -28,6 +28,7 @@ void main()
     char cursorTrava;
     int elem_x, elem_y; // posicao do elemento selecionado
     int varredura, pontos;
+    int tamanho = 8; // tamanho da matriz
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -46,6 +47,13 @@ void main()
             break;
         case '2': // Inicia o jogo
             system("cls");
+
+            matriz = malloc(tamanho * tamanho * sizeof(int));
+            if(!matriz)
+            {
+                printf("Erro ao alocar memoria!");
+                exit(1);
+            }
 
             // inicializando variáveis
             x = LIM_MIN_X+6;
@@ -66,11 +74,11 @@ void main()
             printf("Carregando...");
 
             //inicializando matriz do jogo
-            iniciaMatriz(matriz);
+            iniciaMatriz(matriz, tamanho);
 
             system("cls");
 
-            bordasJogo();
+            bordasJogo(tamanho);
 
             // laço para o jogo; só sai quando 'sair' receber 1
             do
@@ -110,9 +118,9 @@ void main()
                 gotoxy(LIM_MAX_X+2, LIM_MIN_Y+6);
                 printf("Pontos: %d", pontos);
 
-                for(i=0, mat_y=LIM_MIN_Y+3; i<LINHA; i++, mat_y=mat_y+2)
+                for(i=0, mat_y=LIM_MIN_Y+3; i<tamanho; i++, mat_y=mat_y+2)
                 {
-                    for(j=0, mat_x=LIM_MIN_X+6; j<COLUNA; j++, mat_x=mat_x+3)
+                    for(j=0, mat_x=LIM_MIN_X+6; j<tamanho; j++, mat_x=mat_x+3)
                     {
                         // imprime o cursor do jogador
                         if( (mat_x==x && mat_y==y) || (mat_x==elem_x && mat_y==elem_y) )
@@ -124,7 +132,7 @@ void main()
                             textbackground(BLACK);
                         }
                         // imprime o elemento da matriz
-                        exibeElemento(matriz[i][j], mat_x, mat_y);
+                        exibeElemento( *(matriz+(i*tamanho+j)), mat_x, mat_y);
                     }
                 }
 
@@ -166,12 +174,12 @@ void main()
                         }
                         else
                         {
-                            if( testaTroca(matriz, elem_x, elem_y, x, y) )
+                            if( testaTroca(elem_x, elem_y, x, y) )
                             {
-                                trocaElementos(matriz, elem_x, elem_y, x, y);
+                                trocaElementos(matriz, tamanho, elem_x, elem_y, x, y);
                                 do
                                 {
-                                    varredura = fazVarredura(matriz);
+                                    varredura = fazVarredura(matriz, tamanho);
                                     pontos = pontos + (varredura*CONST_PONTOS);
                                     tempo = tempo + (varredura*CONST_TEMPO);
                                 }
@@ -213,8 +221,19 @@ void main()
             printf("\n\n\t\tGAME OVER\n\n");
             textcolor(LIGHTGRAY);
             printf("\t\t%d pontos!\n", pontos);
+            free(matriz);
             break;
-        case '3': // Sai do jogo
+        case '3': // Ver ranking
+            break;
+        case '4': // Determinar tamanho da matriz
+            do
+            {
+                printf("Informe o tamanho da matriz (5-10): ");
+                scanf("%d", &tamanho);
+            }
+            while(tamanho < 5 || tamanho > 10);
+            break;
+        case '5': // Sai do jogo
             printf("Saindo...");
             break;
         default:
@@ -223,6 +242,6 @@ void main()
         fflush(stdin);
         getchar();
     }
-    while(opcao!='3');
+    while(opcao!='5');
 }
 

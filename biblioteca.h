@@ -6,8 +6,8 @@
 #include <windows.h>
 #include "janelas.h"
 
-#define LINHA 8 // número de linhas
-#define COLUNA 8 // número de colunas
+//#define LINHA 8 // número de linhas
+//#define COLUNA 8 // número de colunas
 
 // Limites
 #define LIM_MIN_X 2
@@ -37,14 +37,14 @@
 #define BORDA_INF_DIREITA 188
 
 void menu();
-void bordasJogo();
-void iniciaMatriz(int m[LINHA][COLUNA]);
-int fazVarredura(int m[LINHA][COLUNA]);
-int descobrePosJ(int x);
-int descobrePosI(int y);
+void bordasJogo(int tam);
+void iniciaMatriz(int *m, int tam);
+int fazVarredura(int *m, int tam);
+int descobrePosJ(int x, int tam);
+int descobrePosI(int y, int tam);
 void exibeElemento(int elemento, int x, int y);
-void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
-int testaTroca(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2);
+void trocaElementos(int *m, int tam, int x1, int y1, int x2, int y2);
+int testaTroca(int x1, int y1, int x2, int y2);
 int sorteiaElemento();
 void exibeInstrucoes();
 void sequenciaFrutas(int a);
@@ -59,10 +59,12 @@ void menu()
 
     printf("\n\n1 - Instrucoes sobre a pontuacao\n");
     printf("2 - Iniciar jogo\n");
-    printf("3 - Sair\n\n");
+    printf("3 - Ver ranking\n");
+    printf("4 - Determinar tamanho da matriz\n");
+    printf("5 - Sair\n\n");
 }
 
-void bordasJogo()
+void bordasJogo(int tam)
 {
     int i, j;
 
@@ -98,41 +100,38 @@ void bordasJogo()
     printf("%c", BORDA_INF_DIREITA);
 
     // Imprime índices do jogo
-    for(i=LIM_MIN_X+6, j=65; j<65+LINHA; i=i+3, j++)
+    for(i=LIM_MIN_X+6, j=65; j<65+tam; i=i+3, j++)
     {
         gotoxy(i, LIM_MIN_Y+1);
         printf("%c", j);
     }
-    for(i=LIM_MIN_Y+3, j=1; j<1+COLUNA; i=i+2, j++)
+    for(i=LIM_MIN_Y+3, j=1; j<1+tam; i=i+2, j++)
     {
         gotoxy(LIM_MIN_X+2, i);
         printf("%d", j);
     }
 }
 
-void iniciaMatriz(int m[LINHA][COLUNA])
+void iniciaMatriz(int *m, int tam)
 {
-    int i, j;
+    int i;
     int a;
 
-    for(i=0; i<LINHA; i++)
+    for(i=0; i<(tam*tam); i++)
     {
-        for(j=0; j<COLUNA; j++)
-        {
-            m[i][j] = sorteiaElemento();
-            // aguarda 20ms para que não sorteie o mesmo elemento
-            Sleep(20);
-        }
+        *(m+i) = sorteiaElemento();
+        // aguarda 20ms para que não sorteie o mesmo elemento
+        Sleep(20);
     }
     // garante que nao sobrara nenhuma combinacao
     do
     {
-        a = fazVarredura(m);
+        a = fazVarredura(m, tam);
     }
     while(a);
 }
 
-int fazVarredura(int m[LINHA][COLUNA])
+int fazVarredura(int *m, int tam)
 {
     int i, j;
     int a, b, c;
@@ -140,18 +139,18 @@ int fazVarredura(int m[LINHA][COLUNA])
     int pontos = 0;
 
     // faz a varredura horizontal
-    for(i=0; i<LINHA; i++)
+    for(i=0; i<tam; i++)
     {
         cont = 0;
-        aux = m[i][0];
+        aux = *(m+(i*tam));
         a = 0;
-        for(j=1; j<COLUNA; j++)
+        for(j=1; j<tam; j++)
         {
-            if( aux == m[i][j] )
+            if( aux == *(m+(i*tam+j)) )
             {
                 cont++;
                 // para quando a combinaçao estiver na ultima coluna
-                if( (j+1==COLUNA) && (cont>=2) )
+                if( (j+1==tam) && (cont>=2) )
                 {
                     pontos = pontos + cont + 1;
                     if( i>0 )
@@ -161,7 +160,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                         {
                             for(c=i; c>0; c--)
                             {
-                                m[c][b] = m[c-1][b];
+                                *(m+(c*tam+b)) = *(m+((c-1)*tam+b));
                             }
                         }
                     }
@@ -173,17 +172,17 @@ int fazVarredura(int m[LINHA][COLUNA])
                         {
                             do
                             {
-                                m[0][b] = sorteiaElemento();
+                                *(m+b) = sorteiaElemento();
                             }
-                            while( m[0][b]==m[1][b] );
+                            while( *(m+b) == *(m+(tam+b)) );
                         }
                         else
                         {
                             do
                             {
-                                m[0][b] = sorteiaElemento();
+                                *(m+b) = sorteiaElemento();
                             }
-                            while( m[0][b]==m[0][b+1] || m[0][b]==m[1][b] );
+                            while( *(m+b) == *(m+(b+1)) || *(m+b) == *(m+(tam+b)) );
                         }
                     }
                 }
@@ -201,7 +200,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                         {
                             for(c=i; c>0; c--)
                             {
-                                m[c][b] = m[c-1][b];
+                                *(m+(c*tam+b)) = *(m+((c-1)*tam+b));
                             }
                         }
                     }
@@ -211,31 +210,31 @@ int fazVarredura(int m[LINHA][COLUNA])
                         // só sai do laço se não for repetido
                         do
                         {
-                            m[0][b] = sorteiaElemento();
+                            *(m+b) = sorteiaElemento();
                         }
-                        while( m[0][b]==m[0][b+1] || m[0][b]==m[1][b] );
+                        while( *(m+b) == *(m+(b+1)) || *(m+b) == *(m+(tam+b)) );
                     }
                 }
                 cont = 0;
-                aux = m[i][j];
+                aux = *(m+(i*tam+j));
                 a = j;
             }
         }
     }
 
     // faz a varredura vertical
-    for(j=0; j<COLUNA; j++)
+    for(j=0; j<tam; j++)
     {
         cont = 0;
-        aux = m[0][j];
+        aux = *(m+j);
         a = 0;
-        for(i=1; i<LINHA; i++)
+        for(i=1; i<tam; i++)
         {
-            if( aux == m[i][j] )
+            if( aux == *(m+(i*tam+j)) )
             {
                 cont++;
                 // para quando a combinaçao estiver na ultima linha
-                if( (i+1==LINHA) && (cont>=2) )
+                if( (i+1==tam) && (cont>=2) )
                 {
                     pontos = pontos + cont + 1;
                     if(a>0)
@@ -243,7 +242,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                         // faz elementos descerem uma posição
                         for(b=a-1; b>=0; b--)
                         {
-                            m[b+(cont+1)][j] = m[b][j];
+                            *(m+((b+(cont+1))*tam+j)) = *(m+(b*tam+j));
                         }
                     }
                     // sorteia os elementos no topo
@@ -252,9 +251,9 @@ int fazVarredura(int m[LINHA][COLUNA])
                         // só sai do laço se não forem repetidos
                         do
                         {
-                            m[b][j] = sorteiaElemento();
+                            *(m+(b*tam+j)) = sorteiaElemento();
                         }
-                        while( m[b][j]==m[b][j+1] || m[b][j]==m[b+1][j] );
+                        while( *(m+(b*tam+j)) == *(m+(b*tam+(j+1))) || *(m+(b*tam+j)) == *(m+((b+1)*tam+j)) );
                     }
                 }
             }
@@ -269,7 +268,7 @@ int fazVarredura(int m[LINHA][COLUNA])
                         // faz elementos descerem uma posição
                         for(b=a-1; b>=0; b--)
                         {
-                            m[b+(cont+1)][j] = m[b][j];
+                            *(m+((b+(cont+1))*tam+j)) = *(m+(b*tam+j));
                         }
                     }
                     // sorteia os elementos no topo
@@ -278,13 +277,13 @@ int fazVarredura(int m[LINHA][COLUNA])
                         // só sai do laço se não forem repetidos
                         do
                         {
-                            m[b][j] = sorteiaElemento();
+                            *(m+(b*tam+j)) = sorteiaElemento();
                         }
-                        while( m[b][j]==m[b][j+1] || m[b][j]==m[b+1][j] );
+                        while( *(m+(b*tam+j)) == *(m+(b*tam+(j+1))) || *(m+(b*tam+j)) == *(m+((b+1)*tam+j)) );
                     }
                 }
                 cont = 0;
-                aux = m[i][j];
+                aux = *(m+(i*tam+j));
                 a = i;
             }
         }
@@ -294,10 +293,10 @@ int fazVarredura(int m[LINHA][COLUNA])
 
 
 
-int descobrePosJ(int x)
+int descobrePosJ(int x, int tam)
 {
     int i, j;
-    for(i=0, j=LIM_MIN_X+6; i<LINHA; i++, j=j+3)
+    for(i=0, j=LIM_MIN_X+6; i<tam; i++, j=j+3)
     {
         if(j==x)
         {
@@ -307,10 +306,10 @@ int descobrePosJ(int x)
     return 0;
 }
 
-int descobrePosI(int y)
+int descobrePosI(int y, int tam)
 {
     int i, j;
-    for(i=0, j=LIM_MIN_Y+3; i<COLUNA; i++, j=j+2)
+    for(i=0, j=LIM_MIN_Y+3; i<tam; i++, j=j+2)
     {
         if(j==y)
         {
@@ -345,21 +344,21 @@ void exibeElemento(int elemento, int x, int y)
     textcolor(LIGHTGRAY);
 }
 
-void trocaElementos(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
+void trocaElementos(int *m, int tam, int x1, int y1, int x2, int y2)
 {
     int aux;
 
-    x1 = descobrePosJ(x1);
-    y1 = descobrePosI(y1);
-    x2 = descobrePosJ(x2);
-    y2 = descobrePosI(y2);
+    x1 = descobrePosJ(x1, tam);
+    y1 = descobrePosI(y1, tam);
+    x2 = descobrePosJ(x2, tam);
+    y2 = descobrePosI(y2, tam);
 
-    aux = m[y1][x1];
-    m[y1][x1] = m[y2][x2];
-    m[y2][x2] = aux;
+    aux = *(m+(y1*tam+x1));
+    *(m+(y1*tam+x1)) = *(m+(y2*tam+x2));
+    *(m+(y2*tam+x2)) = aux;
 }
 
-int testaTroca(int m[LINHA][COLUNA], int x1, int y1, int x2, int y2)
+int testaTroca(int x1, int y1, int x2, int y2)
 {
     if(
         // só permite trocar com o elemento vizinho
