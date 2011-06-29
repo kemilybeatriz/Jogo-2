@@ -27,10 +27,18 @@
 #define BORDA_SUP_DIREITA 187
 #define BORDA_INF_DIREITA 188
 
+#define TAM_NOME 64
+
 struct COORDENADA
 {
     int x;
     int y;
+};
+
+struct JOGADOR
+{
+    char nome[TAM_NOME];
+    int pontos;
 };
 
 void menu();

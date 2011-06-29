@@ -17,19 +17,19 @@ void main()
 {
     int *matriz; // matriz do jogo
     int i, j; // usadas para percorrer a matriz
-    int mat_x, mat_y; // usadas para posicionar cada item da matriz
-    int x, y; // usadas para posicionar o cursor do jogador
+    struct COORDENADA mat; // usadas para posicionar cada item da matriz
+    struct COORDENADA c; // usadas para posicionar o cursor do jogador
     char opcao; // usada para o menu
     char a; // usada na captura das teclas durante o jogo
     char sair; // usada para sair do laço do jogo
     int tempo, tempoTeste1, tempoTeste2; // usadas para controlar o tempo
     char cursorSelecao; // usada para selecionar os elementos
     char cursorTrava;
-    int elem_x, elem_y; // posicao do elemento selecionado
+    struct COORDENADA elem; // posicao do elemento selecionado
     int varredura, pontos;
     int tamanho = 8; // tamanho da matriz
-    struct COORDENADA lim_min;
-    struct COORDENADA lim_max;
+    struct COORDENADA lim_min; // limite mínimo
+    struct COORDENADA lim_max; // limite máximo
 
     // define o titulo da janela
     system("title Papagaio Sedento");
@@ -58,16 +58,16 @@ void main()
 
             // inicializando variáveis
             calculaLimites(&lim_min, &lim_max, tamanho);
-            x = lim_min.x+6;
-            y = lim_min.y+3;
+            c.x = lim_min.x+6;
+            c.y = lim_min.y+3;
             sair = 0;
             tempo = TEMPO_INICIAL;
             tempoTeste1 = time(NULL);
             tempoTeste2 = time(NULL);
             cursorSelecao = 0;
             cursorTrava = 0;
-            elem_x = lim_min.x;
-            elem_y = lim_min.y;
+            elem.x = lim_min.x;
+            elem.y = lim_min.y;
             pontos = 0;
 
             textcolor(LIGHTGRAY);
@@ -120,12 +120,12 @@ void main()
                 gotoxy(lim_max.x+2, lim_min.y+6);
                 printf("Pontos: %d", pontos);
 
-                for(i=0, mat_y=lim_min.y+3; i<tamanho; i++, mat_y=mat_y+2)
+                for(i=0, mat.y=lim_min.y+3; i<tamanho; i++, mat.y=mat.y+2)
                 {
-                    for(j=0, mat_x=lim_min.x+6; j<tamanho; j++, mat_x=mat_x+3)
+                    for(j=0, mat.x=lim_min.x+6; j<tamanho; j++, mat.x=mat.x+3)
                     {
                         // imprime o cursor do jogador
-                        if( (mat_x==x && mat_y==y) || (mat_x==elem_x && mat_y==elem_y) )
+                        if( (mat.x==c.x && mat.y==c.y) || (mat.x==elem.x && mat.y==elem.y) )
                         {
                             textbackground(DARKGRAY);
                         }
@@ -134,7 +134,7 @@ void main()
                             textbackground(BLACK);
                         }
                         // imprime o elemento da matriz
-                        exibeElemento( *(matriz+(i*tamanho+j)), mat_x, mat_y);
+                        exibeElemento( *(matriz+(i*tamanho+j)), mat.x, mat.y);
                     }
                 }
 
@@ -146,27 +146,27 @@ void main()
                     switch (a)
                     {
                     case 72: // seta para cima
-                        if( y>=lim_min.y+5 && y<=lim_max.y-2 )
+                        if( c.y>=lim_min.y+5 && c.y<=lim_max.y-2 )
                         {
-                            y = y-2;
+                            c.y = c.y-2;
                         }
                         break;
                     case 80: // seta para baixo
-                        if( y>=lim_min.y+3 && y<=lim_max.y-4 )
+                        if( c.y>=lim_min.y+3 && c.y<=lim_max.y-4 )
                         {
-                            y = y+2;
+                            c.y = c.y+2;
                         }
                         break;
                     case 77: // seta direita
-                        if( x>=lim_min.x+6 && x<=lim_max.x-6 )
+                        if( c.x>=lim_min.x+6 && c.x<=lim_max.x-6 )
                         {
-                            x = x+3;
+                            c.x = c.x+3;
                         }
                         break;
                     case 75: // seta esquerda
-                        if( x>=lim_min.x+9 && x<=lim_max.x-3 )
+                        if( c.x>=lim_min.x+9 && c.x<=lim_max.x-3 )
                         {
-                            x = x-3;
+                            c.x = c.x-3;
                         }
                         break;
                     case 32: // espaço
@@ -176,9 +176,9 @@ void main()
                         }
                         else
                         {
-                            if( testaTroca(elem_x, elem_y, x, y) )
+                            if( testaTroca(elem.x, elem.y, c.x, c.y) )
                             {
-                                trocaElementos(matriz, tamanho, elem_x, elem_y, x, y);
+                                trocaElementos(matriz, tamanho, elem.x, elem.y, c.x, c.y);
                                 do
                                 {
                                     varredura = fazVarredura(matriz, tamanho);
@@ -190,8 +190,8 @@ void main()
 
                             cursorSelecao = 0;
                             cursorTrava = 0;
-                            elem_x = lim_min.x;
-                            elem_y = lim_min.y;
+                            elem.x = lim_min.x;
+                            elem.y = lim_min.y;
                         }
                         break;
                     case 27: // botão ESC para sair
@@ -204,8 +204,8 @@ void main()
                 {
                     if(cursorTrava==0)
                     {
-                        elem_x = x;
-                        elem_y = y;
+                        elem.x = c.x;
+                        elem.y = c.y;
                         cursorTrava = 1;
                     }
                 }
